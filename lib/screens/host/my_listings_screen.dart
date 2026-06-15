@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
+import 'qr_screen.dart';
 import '../../models/listing_model.dart';
 import '../../providers/auth_provider.dart';
 import '../../services/listing_service.dart';
@@ -84,19 +84,30 @@ class _MyListingsScreenState
 
                 return Card(
                   child: ListTile(
-                    title:
-                        Text(
-                      listing.title,
-                    ),
-                    subtitle:
-                        Text(
-                      listing.address,
-                    ),
-                    trailing:
-                        Text(
-                      "₹${listing.hourlyRate}/hr",
-                    ),
-                  ),
+  title: Text(
+    listing.title,
+  ),
+  subtitle: Text(
+    listing.address,
+  ),
+  trailing: ElevatedButton(
+    onPressed: () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) =>
+              QRScreen(
+            listingId:
+                listing.id,
+          ),
+        ),
+      );
+    },
+    child: const Text(
+      "QR",
+    ),
+  ),
+),
                 );
               },
             ),

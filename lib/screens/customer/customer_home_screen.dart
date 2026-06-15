@@ -5,7 +5,8 @@ import '../../models/listing_model.dart';
 import '../../providers/auth_provider.dart';
 import '../../services/listing_service.dart';
 import '../auth/login_screen.dart';
-
+import 'qr_scanner_screen.dart';
+import 'my_bookings_screen.dart';
 class CustomerHomeScreen extends StatefulWidget {
   const CustomerHomeScreen({
     super.key,
@@ -68,6 +69,23 @@ class _CustomerHomeScreenState
           "Find Parking",
         ),
         actions: [
+
+  IconButton(
+    icon: const Icon(
+      Icons.receipt_long,
+    ),
+    onPressed: () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) =>
+              const MyBookingsScreen(),
+        ),
+      );
+    },
+  ),
+  
+
           IconButton(
             icon:
                 const Icon(Icons.logout),

@@ -4,7 +4,8 @@ import 'create_listing_screen.dart';
 import 'my_listings_screen.dart';
 import '../../providers/auth_provider.dart';
 import '../auth/login_screen.dart';
-
+import 'pending_requests_screen.dart';
+import 'exit_requests_screen.dart';
 class HostHomeScreen extends StatelessWidget {
   const HostHomeScreen({super.key});
 
@@ -79,6 +80,41 @@ class HostHomeScreen extends StatelessWidget {
           ),
         ),
       ),
+      const SizedBox(height: 16),
+SizedBox(
+  width: double.infinity,
+  child: ElevatedButton(
+    onPressed: () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) =>
+              const ExitRequestsScreen(),
+        ),
+      );
+    },
+    child: const Text(
+      "Exit Requests",
+    ),
+  ),
+),
+SizedBox(
+  width: double.infinity,
+  child: ElevatedButton(
+    onPressed: () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) =>
+              const PendingRequestsScreen(),
+        ),
+      );
+    },
+    child: const Text(
+      "Pending Requests",
+    ),
+  ),
+),
     ],
   ),
 ),
