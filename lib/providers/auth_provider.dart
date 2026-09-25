@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class AuthProvider extends ChangeNotifier {
   String? token;
   String? role;
+  String? fullName;
 
   bool get isLoggedIn => token != null;
 
@@ -32,12 +33,29 @@ class AuthProvider extends ChangeNotifier {
 
     notifyListeners();
   }
+  Future<void> saveFullName(
+  String value,
+) async {
+
+  final prefs =
+      await SharedPreferences.getInstance();
+
+  await prefs.setString(
+    "full_name",
+    value,
+  );
+
+  fullName = value;
+
+  notifyListeners();
+}
 
   Future<void> loadAuthData() async {
     final prefs = await SharedPreferences.getInstance();
 
     token = prefs.getString("token");
     role = prefs.getString("role");
+    fullName = prefs.getString("full_name");
 
     notifyListeners();
   }
@@ -49,6 +67,7 @@ class AuthProvider extends ChangeNotifier {
 
     token = null;
     role = null;
+    fullName = null;
 
     notifyListeners();
   }

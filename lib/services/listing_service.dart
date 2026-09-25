@@ -18,6 +18,7 @@ class ListingService {
     required double hourlyRate,
     required int totalSpaces,
     required String description,
+    required List<String> amenities,
   }) async {
     return await dio.post(
       "/listings/",
@@ -29,6 +30,7 @@ class ListingService {
         "hourly_rate": hourlyRate,
         "total_spaces": totalSpaces,
         "description": description,
+        "amenities": amenities,
       },
       options: Options(
         headers: {
@@ -55,6 +57,43 @@ class ListingService {
   Future<Response> getAllListings() async {
   return await dio.get(
     "/listings/",
+  );
+}
+Future<Response> getNearbyListings({
+  required double latitude,
+  required double longitude,
+  double radiusKm = 5,
+}) async {
+  return await dio.get(
+    "/listings/nearby",
+    queryParameters: {
+      "latitude": latitude,
+      "longitude": longitude,
+      "radius_km": radiusKm,
+    },
+  );
+}
+Future<Response> uploadListingImage({
+  required String token,
+  required int listingId,
+  required String imagePath,
+}) async {
+
+  FormData formData = FormData.fromMap({
+    "image": await MultipartFile.fromFile(
+      imagePath,
+    ),
+  });
+
+  return await dio.post(
+    "/listings/$listingId/image",
+    data: formData,
+    options: Options(
+      headers: {
+        "Authorization":
+            "Bearer $token",
+      },
+    ),
   );
 }
 }

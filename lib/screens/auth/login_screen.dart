@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 import '../../providers/auth_provider.dart';
 import '../../services/auth_service.dart';
-
+import '../customer/customer_main_screen.dart';
 import '../host/host_home_screen.dart';
-import '../customer/customer_home_screen.dart';
 import 'register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -59,10 +57,15 @@ class _LoginScreenState
 
       final role =
           meResponse.data["role"];
+      final fullName =
+          meResponse.data["full_name"];
 
       await authProvider.saveRole(
         role,
       );
+      await authProvider.saveFullName(
+        fullName,
+        );
 
       if (!mounted) return;
 
@@ -79,7 +82,7 @@ class _LoginScreenState
           context,
           MaterialPageRoute(
             builder: (_) =>
-                const CustomerHomeScreen(),
+                const CustomerMainScreen(),
           ),
         );
       }

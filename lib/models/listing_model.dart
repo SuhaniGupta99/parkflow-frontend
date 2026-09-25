@@ -9,7 +9,10 @@ class ListingModel {
   final int totalSpaces;
   final int availableSpaces;
   final String? description;
+  final String? imageUrl;
+  final List<String> amenities;
   final bool isActive;
+  final String ownerName;
 
   ListingModel({
     required this.id,
@@ -22,7 +25,10 @@ class ListingModel {
     required this.totalSpaces,
     required this.availableSpaces,
     required this.description,
+    required this.imageUrl,
+    required this.amenities,
     required this.isActive,
+    required this.ownerName,
   });
 
   factory ListingModel.fromJson(
@@ -45,8 +51,15 @@ class ListingModel {
           json["available_spaces"],
       description:
           json["description"],
+      imageUrl: 
+          json["image_url"],
+      amenities:
+    (json["amenities"] as List<dynamic>?)
+        ?.cast<String>() ??
+    [],
       isActive:
           json["is_active"],
+      ownerName: json["owner_name"],
     );
   }
 }

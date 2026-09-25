@@ -10,18 +10,26 @@ class BookingService {
   );
 
   Future<Response> createBooking({
-    required String token,
-    required int listingId,
-    required DateTime startTime,
-    required DateTime endTime,
-  }) async {
+  required String token,
+  required int listingId,
+  required int vehicleId,
+  required DateTime startTime,
+  required DateTime endTime,
+}) async {
+  print({
+  "listing_id": listingId,
+  "vehicle_id": vehicleId,
+  "start_time": startTime.toIso8601String(),
+  "end_time": endTime.toIso8601String(),
+});
     return await dio.post(
       "/bookings/",
       data: {
-        "listing_id": listingId,
-        "start_time": startTime.toIso8601String(),
-        "end_time": endTime.toIso8601String(),
-      },
+  "listing_id": listingId,
+  "vehicle_id": vehicleId,
+  "start_time": startTime.toIso8601String(),
+  "end_time": endTime.toIso8601String(),
+},
       options: Options(
         headers: {
           "Authorization": "Bearer $token",

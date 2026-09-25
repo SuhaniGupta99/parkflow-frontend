@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'booking_screen.dart';
-import '../../models/listing_model.dart';
 import '../../providers/auth_provider.dart';
-import '../../services/listing_service.dart';
-import '../auth/login_screen.dart';
-import 'qr_scanner_screen.dart';
-import 'my_bookings_screen.dart';
+import '../../providers/customer_home_provider.dart';
+import 'package:provider/provider.dart';
+import '../../widgets/customer/home/home_header.dart';
+import '../../widgets/customer/home/saved_places.dart';
+import '../../widgets/customer/home/active_booking_card.dart';
+import '../../widgets/customer/home/nearby_parking_section.dart';
 class CustomerHomeScreen extends StatefulWidget {
   const CustomerHomeScreen({
     super.key,
@@ -20,189 +19,103 @@ class CustomerHomeScreen extends StatefulWidget {
 class _CustomerHomeScreenState
     extends State<CustomerHomeScreen> {
 
-  final ListingService listingService =
-      ListingService();
 
-  List<ListingModel> listings = [];
 
-  bool isLoading = true;
+@override
+void initState() {
+  super.initState();
 
-  @override
-  void initState() {
-    super.initState();
+  WidgetsBinding.instance
+      .addPostFrameCallback((_) async {
+    final provider =
+        Provider.of<CustomerHomeProvider>(
+      context,
+      listen: false,
+    );
 
-    loadListings();
-  }
+    final token =
+        Provider.of<AuthProvider>(
+      context,
+      listen: false,
+    ).token!;
 
-  Future<void> loadListings() async {
-    try {
-      final response =
-          await listingService.getAllListings();
+   await Future.wait([
+  provider.loadListings(),
+  provider.loadActiveBooking(token),
+]);
 
-      final data =
-          response.data as List;
+if (!mounted) return;
+  });
+}
 
-      setState(() {
-        listings = data
-            .map(
-              (item) =>
-                  ListingModel.fromJson(item),
-            )
-            .toList();
-
-        isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        isLoading = false;
-      });
-
-      debugPrint(e.toString());
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          "Find Parking",
-        ),
-        actions: [
-
-  IconButton(
-    icon: const Icon(
-      Icons.receipt_long,
-    ),
-    onPressed: () {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) =>
-              const MyBookingsScreen(),
-        ),
-      );
-    },
-  ),
   
+  @override
+  Widget build(
+    BuildContext context,
+  ) {
+    final provider =
+    context.watch<CustomerHomeProvider>();
+    return Scaffold(
+      backgroundColor:
+          const Color(0xfff8f8f8),
 
-          IconButton(
-            icon:
-                const Icon(Icons.logout),
-            onPressed: () async {
-
-              await Provider.of<AuthProvider>(
-                context,
-                listen: false,
-              ).logout();
-
-              if (!context.mounted) return;
-
-              Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(
-                  builder: (_) =>
-                      const LoginScreen(),
-                ),
-                (route) => false,
-              );
-            },
-          ),
-        ],
-      ),
-      body: isLoading
+      body: provider.isLoading
           ? const Center(
               child:
                   CircularProgressIndicator(),
             )
-          : ListView.builder(
-              padding:
-                  const EdgeInsets.all(16),
-              itemCount: listings.length,
-              itemBuilder:
-                  (context, index) {
+          : SafeArea(
+              child:
+                  SingleChildScrollView(
+                padding:
+                    const EdgeInsets.all(
+                  20,
+                ),
+                child: Column(
+                  crossAxisAlignment:
+                      CrossAxisAlignment
+                          .start,
+                  children: [
 
-                final listing =
-                    listings[index];
+                    const HomeHeader(),
 
-                return Card(
-                  margin:
-                      const EdgeInsets.only(
-                    bottom: 16,
-                  ),
-                  elevation: 3,
-                  child: Padding(
-                    padding:
-                        const EdgeInsets.all(
-                      16,
+                    const SizedBox(
+                      height: 30,
                     ),
-                    child: Column(
-                      crossAxisAlignment:
-                          CrossAxisAlignment
-                              .start,
-                      children: [
+                    if (provider.activeBooking != null) ...[
 
-                        Text(
-                          listing.title,
-                          style:
-                              const TextStyle(
-                            fontSize: 20,
-                            fontWeight:
-                                FontWeight
-                                    .bold,
-                          ),
-                        ),
+  ActiveBookingCard(
 
-                        const SizedBox(
-                          height: 8,
-                        ),
+    booking: provider.activeBooking!,
 
-                        Text(
-                          listing.address,
-                        ),
+    remainingTime:
+        provider.remainingTime,
 
-                        const SizedBox(
-                          height: 8,
-                        ),
+    onExtend: () {
 
-                        Text(
-                          "₹${listing.hourlyRate}/hour",
-                        ),
+    },
 
-                        Text(
-                          "Available Spaces: ${listing.availableSpaces}",
-                        ),
+    onNavigate: () {
 
-                        const SizedBox(
-                          height: 12,
-                        ),
+    },
+  ),
 
-                        SizedBox(
-                          width:
-                              double.infinity,
-                          child:
-                              ElevatedButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) =>
-                                  BookingScreen(
-                                    listing: listing,
-                                    ),
-                                    ),
-                                    );
-},
-                            child: const Text(
-                              "Book Now",
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },
+  const SizedBox(height: 24),
+],
+                    const SavedPlaces(),
+
+const SizedBox(
+  height: 24,
+),
+
+NearbyParkingSection(
+  listings: provider.listings,
+  distanceBuilder: provider.getDistance,
+),
+
+                  ],
+                ),
+              ),
             ),
     );
   }

@@ -1,0 +1,4 @@
+enum VehicleListMode {
+  selection,
+  management,
+}
